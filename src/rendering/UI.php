@@ -1,5 +1,7 @@
 <?php
 
+namespace Sherpa\Ui\rendering;
+
 /**
  * Sherpa UI main class.
  */
