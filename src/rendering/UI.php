@@ -10,13 +10,13 @@ class UI
     private const string REGEX_SHERPA_VAR
         = "/@Sherpa\(\.([a-z0-1\.]+)\)/i";
 
-    public protected(set) string $type;
-    public protected(set) string $title;
+    protected string $type;
+    protected string $title;
 
-    public protected(set) string $layoutPath
+    protected string $layoutPath
         = __DIR__ . "/sources/layout.html";
 
-    public protected(set) ?string $stylesheetPath
+    protected ?string $stylesheetPath
         = null;
 
     public function __construct(
