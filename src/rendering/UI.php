@@ -7,16 +7,20 @@ namespace Sherpa\Ui\rendering;
  */
 class UI
 {
-    protected const string LAYOUT_PATH
-        = __DIR__ . "/sources/layout.html";
-
     public protected(set) string $type;
     public protected(set) string $title;
+    public protected(set) string $layoutPath
+        = __DIR__ . "/sources/layout.html";
 
-    public function __construct(string $type, string $title)
+    public function __construct(string $type, string $title, ?string $layoutPath = null)
     {
         $this->type = $type;
         $this->title = $title;
+
+        if ($layoutPath !== null)
+        {
+            $this->layoutPath = $layoutPath;
+        }
     }
 
     /**
@@ -25,7 +29,7 @@ class UI
     public function render(string $slot): void
     {
         $props = $this->props();
-        $layout = file_get_contents(self::LAYOUT_PATH);
+        $layout = file_get_contents($this->layoutPath);
 
         foreach (array_keys($props) as $propKey)
         {
