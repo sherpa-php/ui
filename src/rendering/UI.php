@@ -7,12 +7,23 @@ namespace Sherpa\Ui\rendering;
  */
 class UI
 {
+    private const string REGEX_SHERPA_VAR
+        = "/@Sherpa\(\.([a-z0-1\.]+)\)/i";
+
     public protected(set) string $type;
     public protected(set) string $title;
+
     public protected(set) string $layoutPath
         = __DIR__ . "/sources/layout.html";
 
-    public function __construct(string $type, string $title, ?string $layoutPath = null)
+    public protected(set) ?string $stylesheetPath
+        = null;
+
+    public function __construct(
+        string $type,
+        string $title,
+        ?string $layoutPath = null,
+        ?string $stylesheetPath = null)
     {
         $this->type = $type;
         $this->title = $title;
@@ -21,32 +32,39 @@ class UI
         {
             $this->layoutPath = $layoutPath;
         }
+
+        if ($stylesheetPath !== null)
+        {
+            $this->stylesheetPath = $stylesheetPath;
+        }
     }
 
     /**
      * Render default User Interface.
      */
-    public function render(string $slot): void
+    public function render(string $slot = ""): void
     {
         $props = $this->props();
+        $this->css();
         $layout = file_get_contents($this->layoutPath);
 
-        foreach (array_keys($props) as $propKey)
-        {
-            $prop = $props[$propKey];
-
-            $replacement = match ($prop)
+        $layout = preg_replace_callback(
+            self::REGEX_SHERPA_VAR,
+            function ($result) use ($layout)
             {
-                SpecialProperty::SLOT => $slot,
+                $propKey = $result[1];
+                $prop = self::getPropFromKey($propKey);
 
-                default => $prop
-            };
+                $replacement = match ($prop)
+                {
+                    SpecialProperty::SLOT => $slot,
 
-            $layout = str_replace(
-                "@Sherpa(.$propKey)",
-                $replacement,
-                $layout);
-        }
+                    default => $prop,
+                };
+
+                return "$replacement";
+            },
+            $layout);
 
         echo $layout;
     }
@@ -61,6 +79,33 @@ class UI
             "Title" => $this->title,
             "Slot" => SpecialProperty::SLOT,
         ];
+    }
+
+    /**
+     * Includes CSS stylesheet for rendering.
+     */
+    private function css(): void
+    {
+        if ($this->stylesheetPath !== null
+            && !in_array($this->stylesheetPath, get_included_files()))
+        {
+            echo "<style>";
+            include_once $this->stylesheetPath;
+            echo "</style>";
+        }
+    }
+
+    private function getPropFromKey(string $key): mixed
+    {
+        $splitKey = explode('.', $key);
+        $search = $this->props();
+
+        foreach ($splitKey as $step)
+        {
+            $search = $search[$step];
+        }
+
+        return $search;
     }
 
 
