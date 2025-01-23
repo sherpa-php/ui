@@ -54,6 +54,7 @@ class UI
     {
         return [
             "Type" => $this->type,
+            "Title" => $this->title,
             "Slot" => SpecialProperty::SLOT,
         ];
     }
