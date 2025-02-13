@@ -50,7 +50,7 @@ class UI
 
         $layout = preg_replace_callback(
             self::REGEX_SHERPA_VAR,
-            function ($result) use ($layout)
+            function ($result) use ($layout, $slot)
             {
                 $propKey = $result[1];
                 $prop = self::getPropFromKey($propKey);
